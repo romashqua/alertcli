@@ -1,0 +1,13 @@
+name: Update Homebrew Formula
+on:
+  release:
+    types: [published]
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: alertcli
+          homebrew-tap: username/homebrew-tap
+          download-url: https://github.com/${{ github.repository }}/releases/download/v${{ github.ref_name }}/alertctl-macos
