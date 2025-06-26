@@ -1,0 +1,43 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'  # Запуск при создании тега (например, v1.0.0)
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            name: Linux
+            ext: ""
+          - os: macos-latest
+            name: macOS
+            ext: ""
+          - os: windows-latest
+            name: Windows
+            ext: ".exe"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+      - run: go build -o alertctl${{ matrix.ext }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: alertctl-${{ matrix.name }}
+          path: alertctl${{ matrix.ext }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            alertctl-Linux
+            alertctl-macOS
+            alertctl-Windows.exe
